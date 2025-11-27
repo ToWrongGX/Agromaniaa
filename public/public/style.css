@@ -1,0 +1,29 @@
+:root { --bg:#0b1220; --panel:#121a2b; --text:#eaf2ff; --muted:#9bb0d1; --line:#1e2a42; --brand:#63e6be; --accent:#74c0fc; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:system-ui, Segoe UI, Roboto, Arial; background:linear-gradient(180deg,#0b1220,#0e1730); color:var(--text); }
+header { position:sticky; top:0; background:rgba(11,18,32,.7); backdrop-filter:blur(8px); border-bottom:1px solid var(--line); }
+.brand { padding:14px 16px; font-weight:800; }
+nav { padding:8px 16px; display:flex; gap:8px; }
+nav button { padding:8px 12px; border-radius:8px; border:1px solid var(--line); background:#13203a; color:var(--text); cursor:pointer; }
+nav button.active { background:var(--brand); color:#062017; font-weight:700; }
+main { max-width:1000px; margin:24px auto; padding:0 16px; }
+.card { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px; box-shadow:0 10px 24px rgba(0,0,0,.25); }
+h2 { margin:0 0 12px; font-size:20px; }
+label { display:block; margin:8px 0 6px; color:var(--muted); }
+select, input, textarea { width:100%; padding:10px; border-radius:10px; border:1px solid #24324f; background:#0f1626; color:var(--text); }
+textarea { min-height:80px; }
+.btns { display:flex; gap:10px; margin-top:10px; }
+button { padding:8px 12px; border-radius:10px; border:1px solid #24324f; background:#152034; color:var(--text); cursor:pointer; }
+.grid { display:grid; gap:16px; grid-template-columns:1fr 1fr; }
+@media (max-width:860px){ .grid { grid-template-columns:1fr; } }
+.results .metrics { display:flex; gap:16px; margin-bottom:10px; color:var(--muted); }
+.list { list-style:none; padding:0; margin:0; display:grid; gap:8px; }
+.list li { padding:10px; border:1px solid #24324f; border-radius:10px; background:#0f1626; }
+.note { color:#ffc078; margin-top:8px; }
+.table { width:100%; border-collapse:collapse; margin-top:8px; }
+.table th,.table td{ border-bottom:1px solid #24324f; padding:10px; text-align:left; }
+.row2 { display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:8px; }
+.chartWrap { height:260px; background:#0f1626; border:1px solid #24324f; border-radius:12px; margin-top:10px; }
+#chatBox .msg { margin:8px 0; }
+#chatBox .who { font-weight:700; color:var(--accent); }
+#chatBox .text { background:#0f1626; border:1px solid #24324f; padding:10px; border-radius:10px; }

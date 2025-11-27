@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>AgriFarm Hub — Simple</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="brand">AgriFarm Hub — Smart Crop Advisory & Marketplace</div>
+    <nav>
+      <button class="active" data-tab="advisory">Advisory</button>
+      <button data-tab="market">Marketplace</button>
+      <button data-tab="trends">Price trends</button>
+      <button data-tab="assistant">Chat assistant</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Advisory -->
+    <section id="advisory" class="card">
+      <h2>Smart crop advisory</h2>
+      <div class="grid">
+        <div class="form">
+          <label>Soil type</label>
+          <select id="soil">
+            <option>Loamy</option><option>Clay</option><option>Sandy</option>
+            <option>Black</option><option>Red</option><option>Alluvial</option>
+          </select>
+
+          <label>Season</label>
+          <select id="season">
+            <option>Kharif (Monsoon)</option><option>Rabi (Winter)</option><option>Zaid (Summer)</option>
+          </select>
+
+          <label>Rainfall bias</label>
+          <select id="rainBias">
+            <option>Normal</option><option>Low</option><option>High</option>
+          </select>
+
+          <div class="btns">
+            <button id="recommend">Recommend</button>
+          </div>
+        </div>
+
+        <div class="results">
+          <div class="metrics">
+            <div>Temp: <span id="temp">-- °C</span></div>
+            <div>Rain: <span id="rain">-- mm</span></div>
+            <div>Hum: <span id="hum">-- %</span></div>
+          </div>
+          <ul id="recList" class="list"></ul>
+          <div id="recNote" class="note"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Marketplace -->
+    <section id="market" class="card" style="display:none">
+      <h2>Marketplace</h2>
+      <div class="grid two">
+        <div>
+          <h3>Add listing</h3>
+          <label>Crop</label><input id="mCrop" placeholder="e.g., Wheat" />
+          <label>Qty (kg)</label><input id="mQty" type="number" />
+          <label>₹/kg</label><input id="mPrice" type="number" />
+          <label>Location</label><input id="mLoc" placeholder="e.g., Sadar, UP" />
+          <label>Notes</label><textarea id="mNotes" placeholder="Quality, grade, packaging..."></textarea>
+          <div class="btns"><button id="addListing">Add</button><button id="clearListings">Clear all</button></div>
+
+          <h3>Your listings</h3>
+          <table class="table" id="listingTable">
+            <thead><tr><th>Crop</th><th>Qty</th><th>₹/kg</th><th>Location</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div>
+          <h3>Buyers</h3>
+          <div class="row2">
+            <input id="buyerCropFilter" placeholder="Filter crop" />
+            <input id="buyerLocFilter" placeholder="Filter location" />
+          </div>
+          <table class="table" id="buyersTable">
+            <thead><tr><th>Buyer</th><th>Crop</th><th>₹/kg</th><th>Location</th><th>Contact</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trends -->
+    <section id="trends" class="card" style="display:none">
+      <h2>Price trends</h2>
+      <div class="row2">
+        <select id="trendCrop">
+          <option>Wheat</option><option>Rice</option><option>Maize</option><option>Mustard</option>
+        </select>
+        <input id="trendWindow" type="number" min="2" max="10" value="3" />
+        <button id="renderTrend">Render</button>
+      </div>
+      <div class="chartWrap"><canvas id="trendCanvas"></canvas></div>
+      <div class="note">Mock data for demo. Replace with real sources later.</div>
+    </section>
+
+    <!-- Assistant -->
+    <section id="assistant" class="card" style="display:none">
+      <h2>Chat-based assistant</h2>
+      <div id="chatBox"></div>
+      <div class="row2">
+        <input id="chatInput" placeholder="Ask your question..." />
+        <button id="chatSend">Send</button>
+      </div>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Crop Management</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    form { margin-bottom: 30px; }
+    label { display: block; margin-top: 10px; }
+    input, textarea { width: 300px; padding: 5px; }
+    button { margin-top: 15px; padding: 8px 12px; }
+    .crop-card {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      background: #f9f9f9;
+    }
+    .crop-card img {
+      max-width: 150px;
+      display: block;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Crop Management</h1>
+
+  <!-- Add Crop Form -->
+  <form id="cropForm" enctype="multipart/form-data">
+    <label>Crop Name: <input type="text" name="name" required></label>
+    <label>Quantity: <input type="number" name="quantity" required></label>
+    <label>Price: <input type="number" name="price" required></label>
+    <label>Location: <input type="text" name="location"></label>
+    <label>Seller Name: <input type="text" name="sellerName" required></label>
+    <label>Phone: <input type="text" name="phone" required></label>
+    <label>Season: <input type="text" name="season"></label>
+    <label>Soil Type: <input type="text" name="soilType"></label>
+    <label>Description: <textarea name="description"></textarea></label>
+    <label>Image: <input type="file" name="image" accept="image/*"></label>
+    <button type="submit">Add Crop</button>
+  </form>
+
+  <h2>Available Crops</h2>
+  <div id="cropList"></div>
+
+  <script>
+    const cropForm = document.getElementById('cropForm');
+    const cropList = document.getElementById('cropList');
+
+    // Render a crop card
+    function renderCrop(crop) {
+      const div = document.createElement('div');
+      div.className = 'crop-card';
+      div.innerHTML = `
+        <strong>${crop.name}</strong><br>
+        Quantity: ${crop.quantity}<br>
+        Price: ₹${crop.price}<br>
+        Seller: ${crop.sellerName} (${crop.phone})<br>
+        Location: ${crop.location || 'N/A'}<br>
+        Season: ${crop.season || 'N/A'}<br>
+        Soil Type: ${crop.soilType || 'N/A'}<br>
+        Description: ${crop.description || ''}<br>
+        ${crop.imageUrl ? <img src="${crop.imageUrl}" alt="${crop.name}"> : ''}
+      `;
+      cropList.prepend(div); // show newest at top
+    }
+
+    // Handle form submission
+    cropForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(cropForm);
+
+      try {
+        const res = await fetch('/api/crops', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          renderCrop(data.crop); // show immediately
+          cropForm.reset();
+        } else {
+          alert('Error: ' + (data.message || 'Failed to add crop'));
+        }
+      } catch (err) {
+        alert('Error adding crop: ' + err.message);
+      }
+    });
+
+    // Load crops from API initially
+    async function loadCrops() {
+      try {
+        const res = await fetch('/api/crops');
+        const crops = await res.json();
+        cropList.innerHTML = '';
+        crops.forEach(renderCrop);
+      } catch (err) {
+        cropList.innerHTML = 'Failed to load crops';
+      }
+    }
+
+    loadCrops();
+  </script>
+</body>
+</html>

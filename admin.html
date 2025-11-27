@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Farm Market Admin Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1, h2 { color: #2c3e50; }
+    section { margin-bottom: 40px; }
+    form label { display: block; margin-top: 10px; }
+    input { padding: 5px; width: 250px; }
+    button { margin-top: 10px; padding: 8px 12px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 15px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #f4f4f4; }
+    .delete-btn { color: red; cursor: pointer; }
+    .output-box { background: #f9f9f9; padding: 15px; border: 1px solid #ccc; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Farm Market Admin Dashboard</h1>
+
+  <!-- Input Form -->
+  <section>
+    <h2>Add Price Entry (Input)</h2>
+    <form id="priceForm">
+      <label>Crop: <input type="text" name="crop" required></label>
+      <label>Price: <input type="number" name="price" required></label>
+      <label>Date (YYYY-MM-DD): <input type="text" name="date"></label>
+      <button type="submit">Add Price</button>
+    </form>
+  </section>
+
+  <!-- Output Section -->
+  <section>
+    <h2>Dashboard Output</h2>
+
+    <h3>📊 Statistics</h3>
+    <div id="stats" class="output-box"></div>
+
+    <h3>💰 Price History</h3>
+    <table id="priceTable">
+      <thead>
+        <tr>
+          <th>Crop</th>
+          <th>Price</th>
+          <th>Date</th>
+          <th>Recorded At</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <h3>📈 Price Trends</h3>
+    <pre id="trends" class="output-box"></pre>
+  </section>
+
+  <script>
+    const statsDiv = document.getElementById('stats');
+    const priceForm = document.getElementById('priceForm');
+    const priceTableBody = document.querySelector('#priceTable tbody');
+    const trendsPre = document.getElementById('trends');
+
+    // Render stats
+    async function loadStats() {
+      const res = await fetch('/api/admin/stats');
+      const data = await res.json();
+      statsDiv.innerHTML = `
+        Total Crops: ${data.totalCrops}<br>
+        Total Buyers: ${data.totalBuyers}<br>
+        Total Prices: ${data.totalPrices}<br>
+        Average Crop Price: ₹${data.avgCropPrice}<br>
+        Buyer Status: ${JSON.stringify(data.buyersByStatus)}<br>
+        Last Updated: ${data.timestamp}
+      `;
+    }
+
+    // Render price history
+    async function loadPrices() {
+      const res = await fetch('/api/admin/prices');
+      const prices = await res.json();
+      priceTableBody.innerHTML = '';
+      prices.forEach(p => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${p.crop}</td>
+          <td>₹${p.price}</td>
+          <td>${p.date}</td>
+          <td>${p.recordedAt}</td>
+          <td><span class="delete-btn" onclick="deletePrice('${p.id}')">Delete</span></td>
+        `;
+        priceTableBody.appendChild(row);
+      });
+    }
+
+    // Render trends
+    async function loadTrends() {
+      const res = await fetch('/api/admin/trends');
+      const data = await res.json();
+      trendsPre.textContent = JSON.stringify(data, null, 2);
+    }
+
+    // Handle form submission (input → output)
+    priceForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(priceForm);
+      const body = Object.fromEntries(formData.entries());
+
+      const res = await fetch('/api/admin/prices', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        alert(data.message);
+        priceForm.reset();
+        loadStats();   // refresh stats
+        loadPrices();  // refresh price list
+        loadTrends();  // refresh trends
+      } else {
+        alert('Error: ' + (data.message || 'Failed to add price'));
+      }
+    });
+
+    // Delete price entry
+    async function deletePrice(id) {
+      if (!confirm('Delete this price entry?')) return;
+      const res = await fetch('/api/admin/prices/' + id, { method: 'DELETE' });
+      const data = await res.json();
+      alert(data.message || 'Deleted');
+      loadStats();
+      loadPrices();
+      loadTrends();
+    }
+
+    // Initial load
+    loadStats();
+    loadPrices();
+    loadTrends();
+  </script>
+</body>
+</html>

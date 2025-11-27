@@ -1,0 +1,178 @@
+/* AgriFarm Hub — Farm-inspired design system */
+:root {
+  --green-900:#0b3d2c; --green-700:#145a32; --green-500:#1f8a4c; --green-300:#8fd19e;
+  --earth-900:#3b2f2f; --earth-700:#5c4646; --earth-500:#a67845; --earth-300:#d5b892;
+  --sky-500:#7ec8e3; --sky-300:#bfe6f2; --sun:#ffd166; --cream:#fbf7ee;
+  --ink:#102019; --muted:#7b9086; --bg:#0b1220;
+  --panel:#0f1626; --line:#1e2a42; --white:#ffffff;
+}
+
+* { box-sizing:border-box }
+html,body { margin:0; padding:0 }
+body {
+  font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
+  color: var(--white);
+  background:
+    radial-gradient(1200px 400px at 20% -10%, rgba(126,200,227,.18), transparent 60%),
+    linear-gradient(180deg, #0b1220, #13203a 60%, #0e1730);
+}
+
+/* Header + nav */
+header {
+  position: sticky; top:0; z-index:10;
+  background: rgba(15,22,38,.75);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  display:flex; align-items:center; gap:12px; padding:14px 16px;
+}
+.logo {
+  width:36px; height:36px; border-radius:10px;
+  background:
+    conic-gradient(from 160deg, var(--sun), var(--sky-500), var(--green-500), var(--sun));
+  box-shadow: 0 6px 18px rgba(255,209,102,.35);
+}
+.brand .title { font-weight:800; letter-spacing:.2px }
+nav { padding:8px 16px; display:flex; gap:8px; flex-wrap:wrap }
+nav a {
+  padding:8px 12px; border-radius:10px;
+  border:1px solid var(--line);
+  background:#152034; color:#eaf2ff; text-decoration:none;
+}
+nav a.active, nav a:hover {
+  background:var(--green-500); color:#062017; font-weight:700;
+}
+
+/* Layout */
+main { max-width:1100px; margin:24px auto; padding:0 16px }
+.section {
+  background: var(--panel); border:1px solid var(--line);
+  border-radius:16px; padding:16px;
+  box-shadow:0 10px 24px rgba(0,0,0,.25)
+}
+h1,h2 { margin:0 0 12px }
+h1 { font-size:28px } h2 { font-size:22px }
+p { color:#cfe4ff }
+
+/* Hero (generic) */
+.hero {
+  display:grid; grid-template-columns: 1.1fr .9fr; gap:16px;
+}
+@media (max-width:900px){ .hero{ grid-template-columns:1fr } }
+.heroCard {
+  background: linear-gradient(180deg, #122036, #0f1a2d);
+  border:1px solid #1e2a42;
+  border-radius:16px; padding:16px;
+}
+.heroBadge {
+  display:inline-flex; gap:8px; align-items:center;
+  background:#0f1a2d; border:1px dashed #284064; color:#9bb0d1;
+  padding:6px 10px; border-radius:999px; font-size:12px;
+}
+.heroBtn {
+  display:inline-flex; gap:8px; align-items:center; margin-top:10px;
+  padding:10px 14px; border-radius:10px; border:1px solid #24324f;
+  background: var(--green-500); color:#062017; font-weight:800; cursor:pointer;
+}
+.heroGrid { display:grid; grid-template-columns: repeat(3,1fr); gap:10px; margin-top:10px }
+.heroTile {
+  background:#0f1626; border:1px solid #24324f; border-radius:12px; padding:12px
+}
+.kv {
+  height:180px; border-radius:16px;
+  background:
+    linear-gradient(180deg, rgba(143,209,158,.15), transparent),
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400"><rect width="800" height="400" fill="none"/><g fill="%238fd19e" opacity=".15"><circle cx="120" cy="120" r="60"/><circle cx="350" cy="180" r="70"/><circle cx="620" cy="120" r="55"/></g></svg>') center/cover;
+  border:1px solid #1e2a42;
+}
+
+/* Homepage hero with farmland background */
+.heroBg {
+  background: 
+    linear-gradient(180deg, rgba(20,40,30,.55), rgba(15,22,38,.85)),
+    url('../assets/farm.jpg') center/cover no-repeat;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.heroContent {
+  text-align: center;
+  color: var(--cream);
+  max-width: 700px;
+  padding: 24px;
+}
+.heroContent h1 {
+  font-size: 42px;
+  font-weight: 800;
+  margin-bottom: 16px;
+  color: var(--sun);
+}
+.heroContent p {
+  font-size: 18px;
+  color: var(--sky-300);
+  margin-bottom: 24px;
+}
+.heroActions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+.heroActions .btn {
+  font-size: 16px;
+  padding: 12px 20px;
+}
+
+/* Cards, lists, tables */
+.grid { display:grid; gap:16px }
+.two { grid-template-columns: 1fr 1fr }
+.three { grid-template-columns: repeat(3,1fr) }
+@media (max-width:900px){ .two,.three{grid-template-columns:1fr} }
+
+.card {
+  background:#0f1626; border:1px solid #24324f; border-radius:14px; padding:14px;
+}
+.badge {
+  display:inline-block; padding:6px 10px; border-radius:999px;
+  border:1px solid #284064; background:#0f1a2d; color:#9bb0d1; font-size:12px
+}
+.btn {
+  padding:10px 14px; border-radius:10px; border:1px solid #24324f;
+  background:#152034; color:#eaf2ff; cursor:pointer
+}
+.btn.primary { background: var(--green-500); color:#062017; font-weight:800 }
+.btn.alt { background: var(--sky-500); color:#031a22; font-weight:700 }
+
+.table { width:100%; border-collapse:collapse }
+.table th,.table td { border-bottom:1px solid #24324f; padding:10px; text-align:left }
+.table th { color:#9bb0d1 }
+
+/* Forms */
+label { display:block; margin:8px 0 6px; color:#9bb0d1 }
+input,select,textarea {
+  width:100%; padding:10px; border-radius:10px; border:1px solid #24324f;
+  background:#0f1626; color:#eaf2ff;
+}
+textarea { min-height:90px }
+.formRow { display:grid; grid-template-columns: 1fr 1fr; gap:10px }
+@media (max-width:800px){ .formRow{grid-template-columns:1fr} }
+
+/* Marketplace cards */
+.marketGrid { display:grid; grid-template-columns: repeat(3,1fr); gap:14px }
+@media (max-width:1100px){ .marketGrid{grid-template-columns: repeat(2,1fr)} }
+@media (max-width:720px){ .marketGrid{grid-template-columns: 1fr} }
+.marketItem {
+  background:#0f1626; border:1px solid #24324f; border-radius:14px; padding:12px
+}
+.marketItem .title { font-weight:800; color:#8fd19e }
+.marketItem .meta { color:#9bb0d1; font-size:13px }
+
+/* Stat tiles */
+.stats { display:grid; grid-template-columns: repeat(4,1fr); gap:10px }
+@media (max-width:950px){ .stats{grid-template-columns: repeat(2,1fr)} }
+.stat {
+  background:#0f1626; border:1px solid #24324f; border-radius:12px; padding:12px
+}
+.stat .value { font
+  

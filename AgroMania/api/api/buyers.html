@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Buyers — FarmMarket</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 18px; }
+    .container{ max-width:900px; margin:0 auto; }
+    form{ display:flex; gap:8px; flex-wrap:wrap; align-items:flex-end; margin-bottom:12px; }
+    label{ display:block; font-size:12px; color:#333; }
+    input, select{ padding:6px 8px; font-size:14px; }
+    .list{ margin-top:12px; }
+    .card{ border:1px solid #e0e0e0; padding:10px; border-radius:6px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; }
+    .meta{ font-size:13px; color:#555; }
+    .actions button{ margin-left:6px; }
+    .error{ color:#b00020; }
+    .success{ color:#007700; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Buyer Requests</h1>
+
+    <form id="buyerForm">
+      <div>
+        <label for="buyerName">Buyer Name</label>
+        <input id="buyerName" name="buyerName" required placeholder="Name" />
+      </div>
+      <div>
+        <label for="crop">Crop</label>
+        <input id="crop" name="crop" required placeholder="Crop name" />
+      </div>
+      <div>
+        <label for="quantity">Quantity</label>
+        <input id="quantity" name="quantity" required type="number" min="0" placeholder="Quantity" />
+      </div>
+      <div>
+        <label for="phone">Phone</label>
+        <input id="phone" name="phone" required placeholder="Phone" />
+      </div>
+      <div>
+        <label for="location">Location</label>
+        <input id="location" name="location" placeholder="Optional location" />
+      </div>
+      <div>
+        <button type="submit">Create Request</button>
+      </div>
+    </form>
+
+    <div id="msg" role="status" aria-live="polite"></div>
+
+    <div class="list" id="buyersList"></div>
+  </div>
+
+  <script>
+    (function(){
+      const API_BASE = '/api/buyers';
+      const form = document.getElementById('buyerForm');
+      const listEl = document.getElementById('buyersList');
+      const msgEl = document.getElementById('msg');
+
+      function showMessage(text, type='') {
+        msgEl.textContent = text;
+        msgEl.className = type;
+        if (text) setTimeout(()=> { msgEl.textContent=''; msgEl.className=''; }, 4000);
+      }
+
+      async function getBuyers(filter = '') {
+        try {
+          const url = filter ? API_BASE + '?crop=' + encodeURIComponent(filter) : API_BASE;
+          const res = await fetch(url);
+          if (!res.ok) throw new Error('Failed to fetch buyers: ' + res.status);
+          const data = await res.json();
+          renderBuyers(data);
+        } catch (err) {
+          showMessage(err.message, 'error');
+        }
+      }
+
+      function renderBuyers(buyers) {
+        listEl.innerHTML = '';
+        if (!buyers || buyers.length === 0) {
+          listEl.innerHTML = '<p>No buyer requests found.</p>';
+          return;
+        }
+
+        buyers.forEach(buyer => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          const left = document.createElement('div');
+          left.innerHTML = '<strong>' + escapeHtml(buyer.buyerName) + '</strong><div class="meta">Crop: ' + escapeHtml(buyer.crop) + ' • Qty: ' + (buyer.quantity ?? 0) + '</div>';
+          const right = document.createElement('div');
+          right.className = 'actions';
+          right.innerHTML = `
+            <span class="meta">Status: ${escapeHtml(buyer.status || 'pending')}</span>
+            <button data-id="${buyer.id}" data-action="view">View</button>
+            <button data-id="${buyer.id}" data-action="toggle">Toggle Status</button>
+            <button data-id="${buyer.id}" data-action="delete">Delete</button>
+          `;
+          card.appendChild(left);
+          card.appendChild(right);
+          listEl.appendChild(card);
+        });
+      }
+
+      // Basic client-side validation similar to server validation
+      function validateForm(values) {
+        if (!values.buyerName || !values.crop || values.quantity == null || values.quantity === '' || !values.phone) {
+          return 'Please fill required fields: buyerName, crop, quantity, phone.';
+        }
+        if (isNaN(Number(values.quantity))) return 'Quantity must be a number.';
+        return null;
+      }
+
+      // helper to escape text for DOM
+      function escapeHtml(s) {
+        if (s === null || s === undefined) return '';
+        return String(s)
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll('\", '&#39;');
+      }
+
+      async function createBuyer(payload) {
+        try {
+          const res = await fetch(API_BASE, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const body = await res.json();
+          if (!res.ok) {
+            const err = body && body.errors ? (body.errors.map(e=>e.msg).join('; ') || JSON.stringify(body)) : (body.error || res.statusText);
+            throw new Error(err);
+          }
+          showMessage('Buyer request created', 'success');
+          form.reset();
+          getBuyers();
+        } catch (err) {
+          showMessage(err.message, 'error');
+        }
+      }
+
+      async function viewBuyer(id) {
+        try {
+          const res = await fetch(API_BASE + '/' + encodeURIComponent(id));
+          if (!res.ok) throw new Error('Failed to fetch buyer');
+          const buyer = await res.json();
+          alert('Buyer details:\\n' + JSON.stringify(buyer, null, 2));
+        } catch (err) {
+          showMessage(err.message, 'error');
+        }
+      }
+
+      async function toggleStatus(id) {
+        try {
+          // fetch current buyer to determine next status
+          const res1 = await fetch(API_BASE + '/' + encodeURIComponent(id));
+          if (!res1.ok) throw new Error('Failed to fetch buyer for status');
+          const buyer = await res1.json();
+          const next = buyer.status === 'pending' ? 'contacted' : (buyer.status === 'contacted' ? 'completed' : 'pending');
+
+          const res = await fetch(API_BASE + '/' + encodeURIComponent(id), {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: next })
+          });
+          const body = await res.json();
+          if (!res.ok) throw new Error(body && (body.errors || body.error) ? JSON.stringify(body) : res.statusText);
+          showMessage('Status updated', 'success');
+          getBuyers();
+        } catch (err) {
+          showMessage(err.message, 'error');
+        }
+      }
+
+      async function deleteBuyer(id) {
+        if (!confirm('Delete this buyer request?')) return;
+        try {
+          const res = await fetch(API_BASE + '/' + encodeURIComponent(id), { method: 'DELETE' });
+          const body = await res.json();
+          if (!res.ok) throw new Error(body && body.error ? body.error : res.statusText);
+          showMessage('Buyer deleted', 'success');
+          getBuyers();
+        } catch (err) {
+          showMessage(err.message, 'error');
+        }
+      }
+
+      // Event delegation for card actions
+      listEl.addEventListener('click', (e) => {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        const id = btn.dataset.id;
+        const action = btn.dataset.action;
+        if (action === 'view') return viewBuyer(id);
+        if (action === 'toggle') return toggleStatus(id);
+        if (action === 'delete') return deleteBuyer(id);
+      });
+
+      form.addEventListener('submit', (ev) => {
+        ev.preventDefault();
+        const formData = new FormData(form);
+        const payload = Object.fromEntries(formData.entries());
+        // Normalize quantity
+        payload.quantity = payload.quantity ? Number(payload.quantity) : 0;
+
+        const err = validateForm(payload);
+        if (err) {
+          showMessage(err, 'error');
+          return;
+        }
+        createBuyer(payload);
+      });
+
+      // load initial list
+      getBuyers();
+    })();
+  </script>
+</body>
+</html>
